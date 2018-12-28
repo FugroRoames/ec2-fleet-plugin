@@ -32,6 +32,11 @@
     <f:entry title="${%Label}" field="labelString">
       <f:textbox clazz="required" default="ec2-fleet" />
     </f:entry>
+    <f:description>Make fleet exclusive to jobs with matching labels
+    </f:description>
+    <f:entry title="${%Exclusive Label}" field="exclusiveLabel">
+      <f:checkbox />
+    </f:entry>
     <f:description>Default is /tmp/jenkins-&lt;random ID&gt;
     </f:description>
     <f:entry title="${%Jenkins Filesystem Root}" field="fsRoot">

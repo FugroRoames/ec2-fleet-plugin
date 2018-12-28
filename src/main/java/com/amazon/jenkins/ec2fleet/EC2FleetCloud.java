@@ -77,6 +77,7 @@ public class EC2FleetCloud extends Cloud
     private final ComputerConnector computerConnector;
     private final boolean privateIpUsed;
     private final String labelString;
+    private final boolean exclusiveLabel;
     private final Integer idleMinutes;
     private final Integer minSize;
     private final Integer maxSize;
@@ -109,6 +110,7 @@ public class EC2FleetCloud extends Cloud
                          final String region,
                          final String fleet,
                          final String labelString,
+                         final String exclusiveLabel,
                          final String fsRoot,
                          final ComputerConnector computerConnector,
                          final boolean privateIpUsed,
@@ -124,6 +126,7 @@ public class EC2FleetCloud extends Cloud
         this.fsRoot = fsRoot;
         this.computerConnector = computerConnector;
         this.labelString = labelString;
+        this.exclusiveLabel = exclusiveLabel;
         this.idleMinutes = idleMinutes;
         this.privateIpUsed = privateIpUsed;
         this.minSize = minSize;
@@ -169,6 +172,10 @@ public class EC2FleetCloud extends Cloud
 
     public String getLabelString(){
         return this.labelString;
+    }
+
+    public String getExclusiveLabel(){
+        return this.exclusiveLabel;
     }
 
     public Integer getIdleMinutes() {
@@ -421,7 +428,7 @@ public class EC2FleetCloud extends Cloud
             return; // Wait some more...
 
         final FleetNode slave = new FleetNode(instanceId, "Fleet slave for" + instanceId,
-                fsRoot, this.numExecutors.toString(), Node.Mode.NORMAL, this.labelString, new ArrayList<NodeProperty<?>>(),
+                fsRoot, this.numExecutors.toString(), this.exclusiveLabel ? Node.Mode.EXCLUSIVE : Node.Mode.NORMAL, this.labelString, new ArrayList<NodeProperty<?>>(),
                 FLEET_CLOUD_ID, computerConnector.launch(address, TaskListener.NULL));
 
         // Initialize our retention strategy
@@ -502,7 +509,7 @@ public class EC2FleetCloud extends Cloud
 
     @Override public boolean canProvision(final Label label) {
         // TODO: Make label exclusivity an option
-        boolean result = fleet != null && (Label.parse(this.labelString).containsAll(label.listAtoms()));
+        boolean result = fleet != null && ((!this.exclusiveLabel && label == null) || (this.exclusiveLabel && Label.parse(this.labelString).containsAll(label.listAtoms())));
         LOGGER.log(Level.FINE, "CanProvision called on fleet: \"" + this.labelString + "\" wanting: \"" + (label == null ? "(unspecified)" : label.getName()) + "\". Returning " + Boolean.toString(result) + ".");
         return result;
     }
