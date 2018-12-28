@@ -110,7 +110,7 @@ public class EC2FleetCloud extends Cloud
                          final String region,
                          final String fleet,
                          final String labelString,
-                         final String exclusiveLabel,
+                         final boolean exclusiveLabel,
                          final String fsRoot,
                          final ComputerConnector computerConnector,
                          final boolean privateIpUsed,
@@ -174,7 +174,7 @@ public class EC2FleetCloud extends Cloud
         return this.labelString;
     }
 
-    public String getExclusiveLabel(){
+    public boolean getExclusiveLabel(){
         return this.exclusiveLabel;
     }
 
