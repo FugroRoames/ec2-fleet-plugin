@@ -106,7 +106,8 @@ public class EC2FleetCloud extends Cloud
     }
 
     @DataBoundConstructor
-    public EC2FleetCloud(final String credentialsId,
+    public EC2FleetCloud(final String name,
+                         final String credentialsId,
                          final String region,
                          final String fleet,
                          final String labelString,
@@ -118,7 +119,7 @@ public class EC2FleetCloud extends Cloud
                          final Integer minSize,
                          final Integer maxSize,
                          final Integer numExecutors) {
-        super(FLEET_CLOUD_ID);
+        super(name == null || name.equals("") ? FLEET_CLOUD_ID : name);
         initCaches();
         this.credentialsId = credentialsId;
         this.region = region;
@@ -427,9 +428,9 @@ public class EC2FleetCloud extends Cloud
         if (address == null)
             return; // Wait some more...
 
-        final FleetNode slave = new FleetNode(instanceId, "Fleet slave for" + instanceId,
+        final FleetNode slave = new FleetNode(instanceId, "Fleet slave for " + this.name + " (" + instanceId + ")",
                 fsRoot, this.numExecutors.toString(), this.exclusiveLabel ? Node.Mode.EXCLUSIVE : Node.Mode.NORMAL, this.labelString, new ArrayList<NodeProperty<?>>(),
-                FLEET_CLOUD_ID, computerConnector.launch(address, TaskListener.NULL));
+                this.name, computerConnector.launch(address, TaskListener.NULL));
 
         // Initialize our retention strategy
         if (getIdleMinutes() != null)
